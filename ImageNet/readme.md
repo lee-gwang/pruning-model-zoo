@@ -41,7 +41,8 @@ scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[20, 40],
 # setting 2
 epoch = 60
 optimizer = torch.optim.SGD(net.parameters(), lr=0.01, momentum= 0.9, weight_decay= 1e-4)
-scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer=optimizer, mode='max', patience=3, verbose=True, factor=0.3, threshold=1e-4, min_lr=1e-6)
+scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer=optimizer, mode='max', patience=3, verbose=True, 
+                                                        factor=0.3, threshold=1e-4, min_lr=1e-6)
             
 
 ```
