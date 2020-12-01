@@ -5,6 +5,9 @@
 | ResNet34  |  M     |     M     | 73.31%     | -                                                            |
 | ResNet50  |  M     |  M     | -     | - |
 | ResNet101  |  M     |  M     |  -        | - |
+| MobileNetv3-large-1.0  |  M     |  M     |  -        | - |
+| efficientnet-b0  |  M     |  M     |  -        | - |
+| efficientnet-b1  |  M     |  M     |  -        | - |
 
 
 ## Training Example
