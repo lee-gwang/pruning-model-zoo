@@ -1,8 +1,18 @@
+## Models
+
+|              | FLOPs     | Parameters | Top1-acc  | Pretrained Model                                             |
+| -----------  | --------- | ---------- | --------- | ------------------------------------------------------------ |
+| ResNet20  |  M     |   M     | -     | -                                                            |
+| ResNet32  |  M     |     M     | -     | -                                                            |
+| ResNet44  |  M     |  M     | -     | - |
+| ResNet56  |  M     |  M     |  -        | - |
+
+
 ## Training Example
 
 ```python
-# resnet18 / global threshold / group-level pruning / sparsity:0.5
-python3 train.py --model=ResNet-18 --prune_method=global --prune_type=group --sparsity=0.5 --save_folder=resnet18_model_path --batch_size=64 --epochs=160
+# resnet20 / global threshold / group-level pruning / sparsity:0.5
+python3 train.py --model=ResNet-20 --prune_method=global --prune_type=group --sparsity=0.5 --save_folder=resnet18_model_path --batch_size=64 --epochs=160
 
 ```
 ## Data Pre-processing
