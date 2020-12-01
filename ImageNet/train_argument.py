@@ -17,6 +17,7 @@ def parser():
     parser.add_argument('--learning_rate', '-lr', type=float, default=0.1, help='learning rate')
     parser.add_argument('--momentum', type=float, default=0.9, help="SGD momentum(defalt: 0.9)")
     parser.add_argument('--weight_decay', type=float, default=1e-4, help="SGD weight decay(defalt: 1e-4)")
+    parser.add_argument('--num_worker', '-nw', type=int, default=16, help='dataloader num_worker')
 
     ## scheduler
     parser.add_argument('--scheduler', default='plateau', type=str, help='scheduler(multistep, plateau)')

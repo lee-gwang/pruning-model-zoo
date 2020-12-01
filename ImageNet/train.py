@@ -80,7 +80,7 @@ def main(args):
                             transforms.ToTensor(),
                             transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
                         ])),
-            batch_size=args.batch_size, shuffle=True, num_workers=16, pin_memory=True)
+            batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, pin_memory=True)
         #
         test_loader = torch.utils.data.DataLoader(
             datasets.ImageNet('/data/imagenet/', split='val',download=False, transform=transforms.Compose([
@@ -89,7 +89,7 @@ def main(args):
                             transforms.ToTensor(),
                             transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
                         ])),
-            batch_size=args.batch_size, shuffle=False, num_workers=16 ,pin_memory=True)
+            batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers ,pin_memory=True)
 
     # optimizer & scheduler
     optimizer = torch.optim.SGD(net.parameters(), lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
