@@ -19,7 +19,7 @@ def parser():
     parser.add_argument('--weight_decay', type=float, default=1e-4, help="SGD weight decay(defalt: 1e-4)")
 
     ## scheduler
-    parser.add_argument('--scheduler', default='plateau', type=str, help='scheduler(multi-step, plateau)')
+    parser.add_argument('--scheduler', default='plateau', type=str, help='scheduler(multistep, plateau)')
     parser.add_argument('--multi_step_epoch', default='[30, 60]', type=str, help='multi-step decay epoch')
     parser.add_argument('--multi_step_gamma', default=0.1, type=float, help='multi-step decay gamma. e.g)gamma=0.1, lr:0.1 --> 0.01')
 

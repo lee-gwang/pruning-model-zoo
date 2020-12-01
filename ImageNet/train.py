@@ -31,7 +31,6 @@ def main(args):
 
     logger = create_logger(model_folder, 'train', 'info')
     print_args(args, logger)
-
     
     # seed
     torch.manual_seed(args.seed)
@@ -195,5 +194,4 @@ def main(args):
 
 if __name__ == '__main__':
     args = parser()
-    logger.info(args)
     main(args)
