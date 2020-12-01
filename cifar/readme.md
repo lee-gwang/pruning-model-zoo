@@ -1,3 +1,10 @@
+## Training Example
+
+```python
+# resnet18 / global threshold / group-level pruning / sparsity:0.5
+python3 train.py --model=ResNet-18 --prune_method=global --prune_type=group --sparsity=0.5 --save_folder=resnet18_model_path --batch_size=64 --epochs=160
+
+```
 ## Data Pre-processing
 
 I used the following code for data pre-processing on CIFAR10 & CIFAR100:
