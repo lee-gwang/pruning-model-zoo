@@ -96,7 +96,7 @@ def main(args):
     optimizer = torch.optim.SGD(net.parameters(), lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
     
     if args.scheduler == 'multistep':
-        scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[80, 120], gamma=0.1)
+        scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones= eval(args.multi_step_epoch), gamma=args.multi_step_gamma)
     elif args.scheduler == 'plateau':
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer=optimizer, mode='max', patience=3, verbose=True, factor=0.3, threshold=1e-4, min_lr=1e-6)
 
@@ -186,7 +186,8 @@ def main(args):
     elif args.prune_method =='dst':
         print(f'model pruned!!(prune_method : {args.prune_method}, prune_type : {args.prune_type}-level pruning')
 
-    
+    elif args.prune_method == None:
+        print('Not pruned model training started!')
     # Training
     trainer.train(net, loss, device, train_loader, test_loader, optimizer=optimizer, scheduler=scheduler)
 
@@ -194,4 +195,5 @@ def main(args):
 
 if __name__ == '__main__':
     args = parser()
+    logger.info(args)
     main(args)

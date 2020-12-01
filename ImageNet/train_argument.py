@@ -20,6 +20,8 @@ def parser():
 
     ## scheduler
     parser.add_argument('--scheduler', default='plateau', type=str, help='scheduler(multi-step, plateau)')
+    parser.add_argument('--multi_step_epoch', default='[30, 60]', type=str, help='multi-step decay epoch')
+    parser.add_argument('--multi_step_gamma', default=0.1, type=float, help='multi-step decay gamma. e.g)gamma=0.1, lr:0.1 --> 0.01')
 
     parser.add_argument('--n_eval_step', type=int, default=100, help='number of iteration per one evaluation')
     parser.add_argument('--gpu', '-g', default='0', help='which gpu to use')
