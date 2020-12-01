@@ -5,6 +5,7 @@
 normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                  std=[0.229, 0.224, 0.225])
 
+# train
 train_loader = torch.utils.data.DataLoader(
     datasets.ImageFolder(
     './data/ImageNet_path/', split='train', 
@@ -17,6 +18,7 @@ train_loader = torch.utils.data.DataLoader(
     batch_size=batch_size, shuffle=True,
     num_workers=n_worker) # On server 10, num_worker=16 is the fastest
 
+# validation
 val_loader = torch.utils.data.DataLoader(
     datasets.ImageFolder(
     './data/ImageNet_path/', split='val', 
