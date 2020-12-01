@@ -4,7 +4,7 @@ from utils import *
 import torch.nn.functional as F
 from time import time
 from torch import autograd
-import tqdm.tqdm
+from tqdm import tqdm
 
 class Trainer():
     def __init__(self, args, logger, attack=None):
@@ -25,7 +25,7 @@ class Trainer():
 
         for epoch in range(1, args.epochs+1):
             logger.info("-"*30 + f"{epoch} Epoch start" + "-"*30)
-            for data, label in tr_loader:
+            for data, label in tqdm(tr_loader):
                 data, label = data.to(device), label.to(device)
                 model.train()
                 output = model(data)
@@ -61,7 +61,7 @@ class Trainer():
             #    current_keep_ratio = print_layer_keep_ratio(model, logger)
             if cur_acc > best_acc:
                 best_acc = cur_acc
-                if args.prune_type is not None
+                if args.prune_type is not None:
                     keep_ratio_at_best_acc = current_keep_ratio
                 filename = os.path.join(args.model_folder, 'best_acc_model.pth')
                 save_model(model, filename)
@@ -72,7 +72,7 @@ class Trainer():
                 else:
                     scheduler.step()
         logger.info(">>>>> Training process finish")
-        if args.prune_type is not None
+        if args.prune_type is not None:
             logger.info("Best acc {:.4f}, keep ratio at best acc {:.4f}".format(best_acc, keep_ratio_at_best_acc))
         else:
             logger.info("Best test accuracy {:.4f}".format(best_acc))

@@ -16,8 +16,8 @@ from trainer import *
 
 # models
 from models.resnet import * 
-from models.geffnet import * # https://github.com/rwightman/gen-efficientnet-pytorch
-from models.efficientnet_pytorch import EfficientNet # https://github.com/lukemelas/EfficientNet-PyTorch
+from geffnet import * # https://github.com/rwightman/gen-efficientnet-pytorch
+#from efficientnet_pytorch import EfficientNet # https://github.com/lukemelas/EfficientNet-PyTorch
 
 
 def main(args):

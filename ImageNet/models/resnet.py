@@ -7,7 +7,7 @@ from collections import OrderedDict
 #from .utils import load_state_dict_from_url
 
 
-__all__ = ['ResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101', 'resnet20', 'resnet32', 'resnet44', 'resnet56']
+__all__ = ['ResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101']
 
 
 model_urls = {
@@ -421,7 +421,7 @@ def _resnet(arch, block, layers, pretrained, progress, prune_type, **kwargs):
             
             for name in state_dict:
                 temp_dict[name] = state_dict[name]
-                
+
             model.load_state_dict(temp_dict)
     return model
 
