@@ -1,6 +1,6 @@
 ## Data Pre-processing
 
-I used the following code for data pre-processing on ImageNet:
+I used the following code for data pre-processing on CIFAR10 & CIFAR100:
 
 ```python
 # cifar10
