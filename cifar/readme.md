@@ -32,3 +32,14 @@ val_loader = torch.utils.data.DataLoader(
             
 
 ```
+
+## Optimizer & Scheduler
+
+```python
+epoch = 160
+
+optimizer = torch.optim.SGD(net.parameters(), lr=0.1, momentum= 0.9, weight_decay= 1e-4)
+scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[80, 120], gamma=0.1)
+            
+
+```
