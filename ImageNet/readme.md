@@ -1,3 +1,24 @@
+## Models
+|              | FLOPs     | Parameters | Top1-acc  | Pretrained Model                                             |
+| -----------  | --------- | ---------- | --------- | ------------------------------------------------------------ |
+| ResNet18  |  M     |   M     | 69.76%     | -                                                            |
+| ResNet34  |  M     |     M     | 73.31%     | -                                                            |
+| ResNet50  |  M     |  M     | -     | - |
+| ResNet101  |  M     |  M     |  -        | - |
+
+
+## Training Example
+
+```python
+# resnet18 / global threshold / group-level pruning / sparsity:0.5 / sheduler : plateau
+python3 train.py --model=ResNet-18 --prune_method=global --prune_type=group --sparsity=0.5 
+--save_folder=resnet18_model_path --batch_size=64 --epochs=60 --scheduler=plateau
+
+# resnet18 / dst / group-level pruning / sheduler : multi-step
+python3 train.py --model=ResNet-18 --prune_method=dst --prune_type=group --alpha=1e-4 
+--save_folder=resnet18_model_path --batch_size=64 --epochs=160 --scheduler=multistep
+```
+
 ## Data Pre-processing
 
 
