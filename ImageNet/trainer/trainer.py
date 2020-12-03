@@ -57,13 +57,13 @@ class Trainer():
 
                 #_iter += 1
             cur_acc = self.test(model, device, va_loader)
-            #if args.prune_type is not None
-            #    current_keep_ratio = print_layer_keep_ratio(model, logger)
+            if args.prune_method=='dst':
+                current_keep_ratio = print_layer_keep_ratio(model, logger)
             if cur_acc > best_acc:
                 best_acc = cur_acc
-                if args.prune_type is not None:
+                if args.prune_method=='dst':
                     keep_ratio_at_best_acc = current_keep_ratio
-                filename = os.path.join(args.model_folder, 'best_acc_model.pth')
+                filename = os.path.join(args.model_folder, 'pruned_models.pth')
                 save_model(model, filename)
 
             if scheduler is not None:
@@ -72,7 +72,7 @@ class Trainer():
                 else:
                     scheduler.step()
         logger.info(">>>>> Training process finish")
-        if args.prune_type is not None:
+        if args.prune_method=='dst':
             logger.info("Best acc {:.4f}, keep ratio at best acc {:.4f}".format(best_acc, keep_ratio_at_best_acc))
         else:
             logger.info("Best test accuracy {:.4f}".format(best_acc))

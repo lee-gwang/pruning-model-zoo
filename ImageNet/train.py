@@ -9,6 +9,7 @@ import torch.backends.cudnn as cudnn
 from collections import OrderedDict
 import torch.nn.utils.prune as prune
 from train_argument import parser, print_args
+from ofa.model_zoo import ofa_specialized
 
 from time import time
 from utils import *
@@ -45,21 +46,25 @@ def main(args):
         # when it is dst, resnet block is special
         if args.prune_method!='dst' : p_type=None
 
-        res_dict = {'18': resnet18(pretrained=True, progress=True, prune_type = p_type),
-                    '34': resnet34(pretrained=True, progress=True, prune_type = p_type),
-                    '50': resnet50(pretrained=True, progress=True, prune_type = p_type),
-                    '101': resnet101(pretrained=True, progress=True, prune_type = p_type)
+        res_dict = {'18': resnet18(pretrained=args.pretrained, progress=True, prune_type = p_type),
+                    '34': resnet34(pretrained=args.pretrained, progress=True, prune_type = p_type),
+                    '50': resnet50(pretrained=args.pretrained, progress=True, prune_type = p_type),
+                    '101': resnet101(pretrained=args.pretrained, progress=True, prune_type = p_type)
                     }
             
         net = res_dict[depth_]
 
-    elif "mobilenetv3-large-1":
-        net = mobilenetv3_large_100(pretrained=True)
+    elif args.model == "mobilenetv3-large-1.0":
+        print('mobilenetv3-large-1.0')
+        net = mobilenetv3_large_100(pretrained=args.pretrained)
 
     elif 'efficientnet' in args.model:
         net = EfficientNet.from_pretrained(args.model)
 
-
+    elif args.model == 'once-mobilenetv3-large-1.0':
+        print('once-mobilenetv3-large-1.0')
+        net, image_size = ofa_specialized('note8_lat@65ms_top1@76.1_finetune@25', pretrained=True)
+        
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     net = nn.DataParallel(net)
@@ -72,24 +77,25 @@ def main(args):
     loss = nn.CrossEntropyLoss()
 
     # dataloader
+    if args.model != 'once-mobilenetv3-large-1' : image_size = 224
     if args.dataset=='imagenet':
         train_loader = torch.utils.data.DataLoader(
             datasets.ImageNet('/data/imagenet/', split='train',download=False, transform=transforms.Compose([
-                            transforms.RandomSizedCrop(224),
+                            transforms.RandomSizedCrop(image_size),
                             transforms.RandomHorizontalFlip(),#ImageNetPolicy(),
                             transforms.ToTensor(),
                             transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
                         ])),
-            batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, pin_memory=True)
+            batch_size=args.batch_size, shuffle=True, num_workers=args.num_worker, pin_memory=True)
         #
         test_loader = torch.utils.data.DataLoader(
             datasets.ImageNet('/data/imagenet/', split='val',download=False, transform=transforms.Compose([
-                            transforms.Resize(int(224/0.875)),
-                            transforms.CenterCrop(224),
+                            transforms.Resize(int(image_size/0.875)),
+                            transforms.CenterCrop(image_size),
                             transforms.ToTensor(),
                             transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
                         ])),
-            batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers ,pin_memory=True)
+            batch_size=args.batch_size, shuffle=False, num_workers=args.num_worker ,pin_memory=True)
 
     # optimizer & scheduler
     optimizer = torch.optim.SGD(net.parameters(), lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
@@ -104,19 +110,19 @@ def main(args):
     
     # pruning
     if args.prune_method=='global':
-        if args.prune_type=='group':
+        if args.prune_type=='group_filter':
             tmps = []
             for n,conv in enumerate(net.modules()):
                 if isinstance(conv, nn.Conv2d):
-                    if conv.weight.shape[1]==3:
+                    if conv.weight.shape[1]<=3:
                         continue
                     tmp_pruned = conv.weight.data.clone()
-                    original_size = tmp_pruned.size()
-                    tmp_pruned = tmp_pruned.view(original_size[0], -1)
+                    original_size = tmp_pruned.size() # (out, ch, h, w)
+                    tmp_pruned = tmp_pruned.view(original_size[0], -1) # (out, inp)
                     append_size = 4 - tmp_pruned.shape[1] % 4
                     tmp_pruned = torch.cat((tmp_pruned, tmp_pruned[:, 0:append_size]), 1)
-                    tmp_pruned = tmp_pruned.view(tmp_pruned.shape[0], -1, 4)
-                    tmp_pruned = tmp_pruned.abs().mean(2, keepdim=True).expand(tmp_pruned.shape)
+                    tmp_pruned = tmp_pruned.view(tmp_pruned.shape[0], -1, 4) # out, -1, 4
+                    tmp_pruned = tmp_pruned.abs().mean(2, keepdim=True).expand(tmp_pruned.shape) # out, -1, 4
                     tmp = tmp_pruned.flatten()
                     tmps.append(tmp)
 
@@ -127,27 +133,66 @@ def main(args):
 
             for n,conv in enumerate(net.modules()):
                 if isinstance(conv, nn.Conv2d):
-                    if conv.weight.shape[1]==3:
+                    if conv.weight.shape[1]<=3:
                         continue
                     tmp_pruned = conv.weight.data.clone()
                     original_size = tmp_pruned.size()
                     tmp_pruned = tmp_pruned.view(original_size[0], -1)
                     append_size = 4 - tmp_pruned.shape[1] % 4
                     tmp_pruned = torch.cat((tmp_pruned, tmp_pruned[:, 0:append_size]), 1)
-                    tmp_pruned = tmp_pruned.view(tmp_pruned.shape[0], -1, 4)
-                    tmp_pruned = tmp_pruned.abs().mean(2, keepdim=True).expand(tmp_pruned.shape)
-                    tmp = tmp_pruned.flatten()
+                    tmp_pruned = tmp_pruned.view(tmp_pruned.shape[0], -1, 4) # out, -1, 4
+                    tmp_pruned = tmp_pruned.abs().mean(2, keepdim=True).expand(tmp_pruned.shape) # out,-1, 4
                     tmp_pruned = tmp_pruned.ge(threshold)
-                    tmp_pruned = tmp_pruned.view(original_size[0], -1)
-                    tmp_pruned = tmp_pruned[:, 0: conv.weight.data[0].nelement()]
-                    tmp_pruned = tmp_pruned.contiguous().view(original_size)
+                    tmp_pruned = tmp_pruned.view(original_size[0], -1) # out, inp
+                    #tmp_pruned = tmp_pruned[:, 0: conv.weight.data[0].nelement()]
+                    tmp_pruned = tmp_pruned.contiguous().view(original_size) # out, ch, h, w
 
                     prune.custom_from_mask(conv, name='weight', mask=tmp_pruned)
+        
+        elif args.prune_type=='group_channel':
+            tmps = []
+            for n,conv in enumerate(net.modules()):
+                if isinstance(conv, nn.Conv2d):
+                    if conv.weight.shape[1]<=3:
+                        continue
+                    tmp_pruned = conv.weight.data.clone()
+                    original_size = tmp_pruned.size() # (out, ch, h, w)
+                    tmp_pruned = tmp_pruned.view(original_size[0], -1) # (out, inp)
+                    #append_size = 4 - tmp_pruned.shape[1] % 4
+                    #tmp_pruned = torch.cat((tmp_pruned, tmp_pruned[:, 0:append_size]), 1)
+                    tmp_pruned = tmp_pruned.view(-1, 4, tmp_pruned.shape[1]) # out, -1, 4
+                    tmp_pruned = tmp_pruned.abs().mean(1, keepdim=True).expand(tmp_pruned.shape) # out, -1, 4
+                    tmp = tmp_pruned.flatten()
+                    tmps.append(tmp)
+
+            tmps = torch.cat(tmps)
+            num = tmps.shape[0]*(1 - args.sparsity)#sparsity 0.2
+            top_k = torch.topk(tmps, int(num), sorted=True)
+            threshold = top_k.values[-1]
+
+            for n,conv in enumerate(net.modules()):
+                if isinstance(conv, nn.Conv2d):
+                    if conv.weight.shape[1]<=3:
+                        continue
+                    tmp_pruned = conv.weight.data.clone()
+                    original_size = tmp_pruned.size()
+                    tmp_pruned = tmp_pruned.view(original_size[0], -1)
+                    #append_size = 4 - tmp_pruned.shape[1] % 4
+                    #tmp_pruned = torch.cat((tmp_pruned, tmp_pruned[:, 0:append_size]), 1)
+                    tmp_pruned = tmp_pruned.view(-1, 4, tmp_pruned.shape[1]) # out, -1, 4
+                    tmp_pruned = tmp_pruned.abs().mean(1, keepdim=True).expand(tmp_pruned.shape) # out,-1, 4
+                    tmp_pruned = tmp_pruned.ge(threshold)
+                    #tmp_pruned = tmp_pruned.view(original_size[0], -1) # out, inp
+                    #tmp_pruned = tmp_pruned[:, 0: conv.weight.data[0].nelement()]
+                    tmp_pruned = tmp_pruned.contiguous().view(original_size) # out, ch, h, w
+
+                    prune.custom_from_mask(conv, name='weight', mask=tmp_pruned)       
+        
         elif args.prune_type =='filter':
             tmps = []
             for n,conv in enumerate(net.modules()):
                 if isinstance(conv, nn.Conv2d):
-                    if conv.weight.shape[1]==3:
+                    if conv.weight.shape[1]<=3:
                         continue
                     tmp_pruned = conv.weight.data.clone()
                     original_size = tmp_pruned.size()
@@ -163,7 +208,7 @@ def main(args):
 
             for n,conv in enumerate(net.modules()):
                 if isinstance(conv, nn.Conv2d):
-                    if conv.weight.shape[1]==3:
+                    if conv.weight.shape[1]<=3:
                         continue
                     tmp_pruned = conv.weight.data.clone()
                     original_size = tmp_pruned.size()
