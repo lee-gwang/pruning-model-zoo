@@ -19,6 +19,13 @@ def parser():
     parser.add_argument('--weight_decay', type=float, default=1e-4, help="SGD weight decay(defalt: 1e-4)")
     parser.add_argument('--num_worker', '-nw', type=int, default=16, help='dataloader num_worker')
     parser.add_argument('--pretrained', '-pt', action='store_true' , help='pretrain models/ True or False')
+    parser.add_argument('--pretrain_path', default=None, type=str, help='custum pretrain weight /')
+    parser.add_argument('--conv1_not_train', '-cnt', action='store_true' , help='first conv1 trainable/ True or False')
+    
+    # KD
+    parser.add_argument('--KD', '-kd', action='store_true' , help='knowledge distillation / True for False')
+    parser.add_argument('--KD_ratio','-kdr', type=float, default=1.0, help="kd ratio")
+
     ## scheduler
     parser.add_argument('--scheduler', default='plateau', type=str, help='scheduler(multistep, plateau)')
     parser.add_argument('--multi_step_epoch', default='[30, 60]', type=str, help='multi-step decay epoch')
@@ -31,9 +38,12 @@ def parser():
     #parser.add_argument('--group-shape', type=int, nargs='+', default=[1, 4], help='group shape')
     #parser.add_argument('--grouped-rule', type=str, default='l1', help='grouped rule (l1 or l2)')
     parser.add_argument('--prune_method',  choices=['dst', 'global', 'uniform'], default = None, help='dst / global threshold / uniform sparsity(layer-wise uniform sparsity)')
-    parser.add_argument('--prune_type',  choices=['filter', 'group'], default = None, help='filter-level or group-level(4-level) pruning')
+    parser.add_argument('--prune_type', default = None, help='filter-level or group-level(4-level) pruning')
     parser.add_argument('--sparsity', '-s', type=float, default=0, help='sparsity(zero parameters/ all paramters')
-    parser.add_argument('--alpha', type=float, default=1e-6, help="penalty coefficient/ In the dst method, this controls the sparsity")    
+    parser.add_argument('--alpha', type=float, default=1e-6, help="penalty coefficient/ In the dst method, this controls the sparsity")
+    parser.add_argument('--block_size', type=int, default=4, help='block size') 
+
+    #  
     return parser.parse_args()
 
 def print_args(args, logger=None):
