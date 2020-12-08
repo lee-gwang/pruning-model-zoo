@@ -181,8 +181,8 @@ class Trainer_KD():
             logger.info("Best acc {:.4f}, keep ratio at best acc {:.4f}".format(best_acc, keep_ratio_at_best_acc))
         else:
             logger.info("Best test accuracy {:.4f}".format(best_acc))
-        file_name = os.path.join(args.model_folder, 'final_model.pth')
-        save_model(model, file_name)
+        #file_name = os.path.join(args.model_folder, 'final_model.pth')
+        #save_model(model, file_name)
 
     def test(self, model, device, loader):
 
