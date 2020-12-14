@@ -328,3 +328,5 @@ def main(args):
 if __name__ == '__main__':
     args = parser()
     main(args)
+    if args.model == "mobilenetv3-large-1.0":
+        os.system(f"python onnx_export.py --checkpoint=./checkpoint/{args.model_folder}/removed_moldels.pth --model mobilenetv3_large_100 ./removed_models.onnx")
