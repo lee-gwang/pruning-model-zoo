@@ -10,7 +10,7 @@ import argparse
 import numpy as np
 import onnxruntime
 from data import create_loader, resolve_data_config, Dataset
-from utils import AverageMeter
+from utils_onnx import AverageMeter
 import time
 
 parser = argparse.ArgumentParser(description='Caffe2 ImageNet Validation')
