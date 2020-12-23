@@ -114,7 +114,7 @@ def print_layer_keep_ratio(model, logger):
             grouped_mask = layer.step(grouped_weight)
             #ratio = torch.sum(grouped_mask) / grouped_mask.numel()
             #logger.info("Layer threshold {:.4f}".format(layer.threshold[0]))
-            logger.info("{}, keep ratio {:.4f}".format(layer, ratio))
+            #logger.info("{}, keep ratio {:.4f}".format(layer, ratio))
 
         if isinstance(layer, AlignedGroupedMaskedConv2d):
             weight_shape = layer.weight.shape
@@ -131,7 +131,7 @@ def print_layer_keep_ratio(model, logger):
             total += grouped_mask.numel()*layer.group_shape[1] # 4 
             keep += torch.sum(grouped_mask)*layer.group_shape[1]
             #logger.info("Layer threshold {:.4f}".format(layer.threshold[0]))
-            logger.info("{}, keep ratio {:.4f}".format(layer, ratio))
+            #logger.info("{}, keep ratio {:.4f}".format(layer, ratio))
 
         if isinstance(layer, nn.Linear):
             """어차피 pruning안할거니까 sum으로 갯수세기"""
@@ -141,7 +141,7 @@ def print_layer_keep_ratio(model, logger):
             #ratio = torch.sum(mask) /  mask.numel()
             total += mask.numel()
             keep += torch.sum(mask)
-            logger.info("{}, keep ratio {:.4f}".format(layer, ratio))
+            #logger.info("{}, keep ratio {:.4f}".format(layer, ratio))
 
         if isinstance(layer, nn.Conv2d):
             """어차피 pruningX"""
@@ -151,7 +151,7 @@ def print_layer_keep_ratio(model, logger):
             #ratio = torch.sum(mask) / mask.numel()
             total += mask.numel()
             keep += torch.sum(mask)
-            logger.info("{}, keep ratio {:.4f}".format(layer, ratio))
+            #logger.info("{}, keep ratio {:.4f}".format(layer, ratio))
 
         if isinstance(layer, FilterMaskedConv2d):
             weight_shape = layer.weight.shape
@@ -169,7 +169,7 @@ def print_layer_keep_ratio(model, logger):
             total += grouped_mask.numel()*weight.shape[1]
             keep += torch.sum(grouped_mask)*weight.shape[1]
             #logger.info("Layer threshold {:.4f}".format(layer.threshold[0]))
-            logger.info("{}, keep ratio {:.4f}".format(layer, ratio))
+            #logger.info("{}, keep ratio {:.4f}".format(layer, ratio))
 
     logger.info("Model keep ratio {:.4f}".format(keep/total))
     return keep / total

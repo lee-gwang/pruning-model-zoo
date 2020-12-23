@@ -29,7 +29,7 @@ def parser():
     #parser.add_argument('--group-shape', type=int, nargs='+', default=[1, 4], help='group shape')
     #parser.add_argument('--grouped-rule', type=str, default='l1', help='grouped rule (l1 or l2)')
     parser.add_argument('--prune_method',  choices=['dst', 'global', 'uniform'], default = None, help='dst / global threshold / uniform sparsity(layer-wise uniform sparsity)')
-    parser.add_argument('--prune_type',  choices=['filter', 'group'], default = None, help='filter-level or group-level(4-level) pruning')
+    parser.add_argument('--prune_type',   default = None, help='filter-level or group-level(4-level) pruning/filter, group')
     parser.add_argument('--sparsity', '-s', type=float, default=0, help='sparsity(zero parameters/ all paramters')
     parser.add_argument('--alpha', type=float, default=1e-6, help="penalty coefficient/ In the dst method, this controls the sparsity")    
     return parser.parse_args()

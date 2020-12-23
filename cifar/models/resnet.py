@@ -7,7 +7,7 @@ from collections import OrderedDict
 #from .utils import load_state_dict_from_url
 
 
-__all__ = ['ResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101', 'resnet20', 'resnet32', 'resnet44', 'resnet56']
+__all__ = ['resnet20', 'resnet32', 'resnet44', 'resnet56']
 
 
 model_urls = {
